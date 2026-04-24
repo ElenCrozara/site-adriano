@@ -1,2 +1,4 @@
 User-agent: *
 Allow: /
+
+Sitemap: https://www.eletricista.uberlandia-mg.com.br/sitemap.xml

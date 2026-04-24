@@ -50,7 +50,6 @@
     if (!toggle || !drawer) return;
 
     var mq = window.matchMedia("(max-width: 768px)");
-    var closeEls = drawer.querySelectorAll("[data-nav-drawer-close]");
     var anchors = drawer.querySelectorAll(".nav-drawer__list a[href^='#']");
     var wa = drawer.querySelector(".nav-drawer__wa");
     var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -91,12 +90,6 @@
 
     toggle.addEventListener("click", function () {
       setActive(!drawer.classList.contains("active"));
-    });
-
-    closeEls.forEach(function (el) {
-      el.addEventListener("click", function () {
-        closeMenu();
-      });
     });
 
     anchors.forEach(function (a) {
