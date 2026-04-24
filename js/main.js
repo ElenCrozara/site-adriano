@@ -44,10 +44,98 @@
     });
   }
 
+  (function initNavDrawer() {
+    var toggle = document.getElementById("nav-toggle");
+    var drawer = document.getElementById("nav-drawer");
+    if (!toggle || !drawer) return;
+
+    var mq = window.matchMedia("(max-width: 768px)");
+    var closeEls = drawer.querySelectorAll("[data-nav-drawer-close]");
+    var anchors = drawer.querySelectorAll(".nav-drawer__list a[href^='#']");
+    var wa = drawer.querySelector(".nav-drawer__wa");
+    var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    function headerBarOffset() {
+      var header = document.querySelector(".header");
+      if (!header) return 64;
+      return Math.ceil(header.getBoundingClientRect().height) + 10;
+    }
+
+    function setActive(active) {
+      toggle.classList.toggle("active", active);
+      drawer.classList.toggle("active", active);
+      toggle.setAttribute("aria-expanded", active ? "true" : "false");
+      drawer.setAttribute("aria-hidden", active ? "false" : "true");
+      if (active) toggle.setAttribute("aria-label", "Fechar menu de navegação");
+      else toggle.setAttribute("aria-label", "Abrir menu de navegação");
+    }
+
+    function closeMenu() {
+      setActive(false);
+    }
+
+    function scrollToSection(hash) {
+      if (!hash || hash.length < 2 || hash.charAt(0) !== "#") return;
+      var id = decodeURIComponent(hash.slice(1));
+      var target = document.getElementById(id);
+      if (!target) return;
+      var top =
+        target.getBoundingClientRect().top +
+        window.scrollY -
+        headerBarOffset();
+      window.scrollTo({
+        top: Math.max(0, top),
+        behavior: reduceMotion ? "auto" : "smooth",
+      });
+    }
+
+    toggle.addEventListener("click", function () {
+      setActive(!drawer.classList.contains("active"));
+    });
+
+    closeEls.forEach(function (el) {
+      el.addEventListener("click", function () {
+        closeMenu();
+      });
+    });
+
+    anchors.forEach(function (a) {
+      a.addEventListener("click", function (e) {
+        var href = a.getAttribute("href");
+        if (!href || href.charAt(0) !== "#") return;
+        e.preventDefault();
+        scrollToSection(href);
+        closeMenu();
+      });
+    });
+
+    if (wa) {
+      wa.addEventListener("click", function () {
+        closeMenu();
+      });
+    }
+
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && drawer.classList.contains("active")) {
+        closeMenu();
+        toggle.focus();
+      }
+    });
+
+    function onMqChange() {
+      if (!mq.matches) closeMenu();
+    }
+
+    if (typeof mq.addEventListener === "function") {
+      mq.addEventListener("change", onMqChange);
+    } else if (typeof mq.addListener === "function") {
+      mq.addListener(onMqChange);
+    }
+  })();
+
   /* Carrossel: desktop 3 slides × 3 reviews (3 dots); mobile 1 review (9 dots), mesmo HTML */
   var root = document.getElementById("carousel-depoimentos");
-  if (!root) return;
-
+  if (root) {
   var track = root.querySelector("[data-carousel-track]");
   var slides = root.querySelectorAll("[data-carousel-slide]");
   var cards = root.querySelectorAll("[data-carousel-track] .testimonial-card");
@@ -241,5 +329,6 @@
       },
       { passive: true }
     );
+  }
   }
 })();
